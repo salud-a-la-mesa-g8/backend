@@ -1,0 +1,75 @@
+[{
+  "_id": {
+    "$oid": "6162ee717f70bc60ffed8ac3"
+  },
+  "nombre": "Manzana",
+  "descripcion": "Manzanas rojas",
+  "precio": 1000,
+  "imagen": "/images/manzanas.jpg",
+  "categoria": "Alimentos"
+},{
+  "_id": {
+    "$oid": "6162f0f87f70bc60ffed8acb"
+  },
+  "nombre": "Zanahoria",
+  "descripcion": "Zanahorias pequeñas",
+  "precio": 1500,
+  "imagen": "/images/zanahoria.jpg",
+  "categoria": "Alimentos",
+  "estado": true
+},{
+  "_id": {
+    "$oid": "6162f0fb7f70bc60ffed8acc"
+  },
+  "nombre": "Trigo",
+  "descripcion": "",
+  "precio": 300,
+  "imagen": "/images/zanahoria.jpg",
+  "categoria": "Alimentos"
+},{
+  "_id": {
+    "$oid": "6162f0fd7f70bc60ffed8acd"
+  },
+  "nombre": "lechuga",
+  "descripcion": "Lechuga crespa",
+  "precio": 1000,
+  "imagen": "/images/lechuga.jpg",
+  "categoria": "Alimentos"
+},{
+  "_id": {
+    "$oid": "6162f1007f70bc60ffed8ace"
+  },
+  "nombre": "Semillas",
+  "descripcion": "Mezcla de semillas para sembrar",
+  "precio": 2500,
+  "imagen": "/images/semillas.jpg",
+  "categoria": "Huerta"
+},{
+  "_id": {
+    "$oid": "6162f1027f70bc60ffed8acf"
+  },
+  "nombre": "Tierra",
+  "descripcion": "Tierra abonada para siembra",
+  "precio": 2000,
+  "imagen": "/images/tierra.jpg",
+  "categoria": "Huerta"
+},{
+  "_id": {
+    "$oid": "6162f1047f70bc60ffed8ad0"
+  },
+  "nombre": "Pala",
+  "descripcion": "Pala con mango de madera",
+  "precio": 25000,
+  "imagen": "",
+  "categoria": "Herramientas"
+},{
+  "_id": {
+    "$oid": "619c389dc6dc02b298e02d89"
+  },
+  "nombre": "peras",
+  "descripcion": "peras chilenas",
+  "precio": 1400,
+  "imagen": "/images/peras.jpg",
+  "estado": true,
+  "__v": 0
+}]
