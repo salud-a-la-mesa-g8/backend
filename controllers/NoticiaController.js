@@ -49,10 +49,9 @@ module.exports = {
       
       
       try {
-        // si viene o no algun query param
-        // ojo: no incluir campos númericos o hacerles un cast antes        
-          // const vToken = await token.decode(req, "noticia")
-          // if (!vToken) return res.json({"msg":"error: La firma de la solicitud no es confiable. Salga del sistema y vuelva a ingresar."})
+      
+          const vToken = await token.decode(req, "noticia")
+          if (!vToken) return res.json({"msg":"error: La firma de la solicitud no es confiable. Salga del sistema y vuelva a ingresar."})
 
           const reg = await models.Noticia.find();
           res.status(200).json(reg)
@@ -76,12 +75,12 @@ module.exports = {
     },
 
     estado: async (req, res, next) => {
-      // // acceso y autorización (enviar el nombre del controller) 
-      // const vToken = await token.decode(req,"noticia")
-      // // si el token no es valido
-      // if (!vToken) return res.json({"msg":"error: La firma de la solicitud no es confiable. Salga del sistema y vuelva a ingresar."})
-      // // operativa del controller
-      // //--------------------------------------------------------------
+      // acceso y autorización (enviar el nombre del controller) 
+      const vToken = await token.decode(req,"noticia")
+      // si el token no es valido
+      if (!vToken) return res.json({"msg":"error: La firma de la solicitud no es confiable. Salga del sistema y vuelva a ingresar."})
+      // operativa del controller
+      //--------------------------------------------------------------
       try {
         const regAux1 = await models.Noticia.findOne({ _id: req.body._id })
         let estadoAux = regAux1.estado === 1 ? 0 : 1;
@@ -99,12 +98,12 @@ module.exports = {
     },
 
     update: async (req, res, next) => {
-      // // acceso y autorización (enviar el nombre del controller) 
-      // const vToken = await token.decode(req, "noticia")
+      // acceso y autorización (enviar el nombre del controller) 
+      const vToken = await token.decode(req, "noticia")
       // // si el token no es valido
-      // if (!vToken) return res.json({"msg":"error: La firma de la solicitud no es confiable. Salga del sistema y vuelva a ingresar."})
-      // // operativa del controller
-      // //--------------------------------------------------------------
+      if (!vToken) return res.json({"msg":"error: La firma de la solicitud no es confiable. Salga del sistema y vuelva a ingresar."})
+      // operativa del controller
+      //--------------------------------------------------------------
       try {
         const regBD = await models.Noticia.findOne({ _id: req.body._id })
         
@@ -117,6 +116,8 @@ module.exports = {
             autor: req.body.autor,
             texto_corto: req.body.texto_corto,
             texto_largo:req.body.texto_largo,
+            imagen:req.body.imagen,
+            modifiedBy:req.body.modifiedBy
           }
         )
         const reg = await models.Noticia.findOne({ _id: req.body._id })

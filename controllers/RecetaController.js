@@ -24,9 +24,9 @@ module.exports = {
 
     add: async (req, res, next) => {
         //acceso y autorización (enviar el nombre del controller) 
-        // const vToken = await token.decode(req,"receta")
+        const vToken = await token.decode(req,"receta")
         // //si el token no es valido
-        // if (!vToken) return res.json({"msg":"error: La firma de la solicitud no es confiable. Salga del sistema y vuelva a ingresar."})
+        if (!vToken) return res.json({"msg":"error: La firma de la solicitud no es confiable. Salga del sistema y vuelva a ingresar."})
         //operativa del controller
         
         try {
@@ -47,10 +47,9 @@ module.exports = {
       
       
       try {
-        // si viene o no algun query param
-        // ojo: no incluir campos númericos o hacerles un cast antes
-          // const vToken = await token.decode(req, "noticia")
-          // if (!vToken) return res.json({"msg":"error: La firma de la solicitud no es confiable. Salga del sistema y vuelva a ingresar."})
+        
+          const vToken = await token.decode(req, "noticia")
+          if (!vToken) return res.json({"msg":"error: La firma de la solicitud no es confiable. Salga del sistema y vuelva a ingresar."})
 
           const reg = await models.Receta.find();
           res.status(200).json(reg)
@@ -76,9 +75,9 @@ module.exports = {
 
     estado: async (req, res, next) => {
         // // acceso y autorización (enviar el nombre del controller) 
-        // const vToken = await token.decode(req,"receta")
+        const vToken = await token.decode(req,"receta")
         // // si el token no es valido
-        // if (!vToken) return res.json({"msg":"error: La firma de la solicitud no es confiable. Salga del sistema y vuelva a ingresar."})
+        if (!vToken) return res.json({"msg":"error: La firma de la solicitud no es confiable. Salga del sistema y vuelva a ingresar."})
         // // operativa del controller
         // //--------------------------------------------------------------
         try {
@@ -99,9 +98,9 @@ module.exports = {
 
     update: async (req, res, next) => {
         // // acceso y autorización (enviar el nombre del controller) 
-        // const vToken = await token.decode(req, "receta")
+        const vToken = await token.decode(req, "receta")
         // // si el token no es valido
-        // if (!vToken) return res.json({"msg":"error: La firma de la solicitud no es confiable. Salga del sistema y vuelva a ingresar."})
+        if (!vToken) return res.json({"msg":"error: La firma de la solicitud no es confiable. Salga del sistema y vuelva a ingresar."})
         // // operativa del controller
         // //--------------------------------------------------------------
         try {
