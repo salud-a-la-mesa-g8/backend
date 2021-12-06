@@ -33,6 +33,12 @@ const tuHuertaSchema = new Schema({
         maxlength: [1000, "descripción secundaria: máximo 150 caracteres"],
         minlength: [0, "descripción secundaria: mínimo 3 caracteres"]  
       },
+
+      tipo:{
+        type: Number,
+        enum: [1, 2],
+        default:1
+      },
       estado:{
         type: Number,
         enum: [1, 0],

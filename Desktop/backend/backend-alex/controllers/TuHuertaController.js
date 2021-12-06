@@ -11,9 +11,9 @@ itemCtr.crear = async (req, res) =>{
     if (!vToken) return res.json({"msg":"error: La firma de la solicitud no es confiable. Salga del sistema y vuelva a ingresar."})
     
     try {
-        const{imagen, titulo, subtitulo , descripcion, descripcion2, modifiedBy} = req.body
+        const{imagen, titulo, subtitulo , descripcion, descripcion2, modifiedBy, tipo} = req.body
         const NuevoItem = new Item({
-            imagen, titulo, subtitulo , descripcion, descripcion2, modifiedBy
+            imagen, titulo, subtitulo , descripcion, descripcion2, modifiedBy, tipo
         })
         const tituloItem = await Item.findOne({titulo: req.body.titulo})
         if(!tituloItem){
@@ -26,7 +26,8 @@ itemCtr.crear = async (req, res) =>{
                 subtitulo: NuevoItem.subtitulo,
                 descripcion: NuevoItem.descripcion,
                 descripcion2 : NuevoItem.descripcion2,
-                modifiedBy : NuevoItem.modifiedBy
+                modifiedBy : NuevoItem.modifiedBy,
+                tipo: NuevoItem.tipo
             })
             
         }else{
@@ -43,7 +44,6 @@ itemCtr.crear = async (req, res) =>{
     }
     
 }
-
 itemCtr.listar = async (req, res) =>{
     const vToken = await token.decode(req, "tuhuerta")
     //si el token no es valido
@@ -51,6 +51,39 @@ itemCtr.listar = async (req, res) =>{
     
     try {
         const respuesta = await Item.find()
+        res.json(respuesta)
+        
+    } catch (error) {
+        res.json({
+            mensage:error
+        })
+    }
+    
+}
+
+itemCtr.listarPasos = async (req, res) =>{
+    // const vToken = await token.decode(req, "tuhuerta")
+    //si el token no es valido
+    // if (!vToken) return res.json({"msg":"error: La firma de la solicitud no es confiable. Salga del sistema y vuelva a ingresar."})
+    
+    try {
+        const respuesta = await Item.find({tipo: 1, estado: 1})
+        res.json(respuesta)
+        
+    } catch (error) {
+        res.json({
+            mensage:error
+        })
+    }
+    
+}
+itemCtr.listarMantenimiento = async (req, res) =>{
+    // const vToken = await token.decode(req, "tuhuerta")
+    //si el token no es valido
+    // if (!vToken) return res.json({"msg":"error: La firma de la solicitud no es confiable. Salga del sistema y vuelva a ingresar."})
+    
+    try {
+        const respuesta = await Item.find({tipo: 2, estado: 1})
         res.json(respuesta)
         
     } catch (error) {

@@ -7,6 +7,10 @@ router.post('/crear', ItemCtr.crear)
 
 router.get('/listar', ItemCtr.listar)
 
+router.get('/listarPasos', ItemCtr.listarPasos)
+
+router.get('/listarMantenimiento', ItemCtr.listarMantenimiento)
+
 router.put('/actualizar/:id', ItemCtr.actualizar)
 
 router.put('/estado', ItemCtr.estado)
