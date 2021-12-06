@@ -48,7 +48,7 @@ module.exports = {
       
       try {
         
-          const vToken = await token.decode(req, "noticia")
+          const vToken = await token.decode(req, "receta")
           if (!vToken) return res.json({"msg":"error: La firma de la solicitud no es confiable. Salga del sistema y vuelva a ingresar."})
 
           const reg = await models.Receta.find();

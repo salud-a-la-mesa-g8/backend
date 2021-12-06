@@ -47,7 +47,6 @@ module.exports = {
     
     list: async (req, res, next) => {
       
-      
       try {
       
           const vToken = await token.decode(req, "noticia")
