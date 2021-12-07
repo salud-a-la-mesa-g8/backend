@@ -64,9 +64,8 @@ const usuarioSchema = new Schema({
   exp: {
     type: Number,
     default:0
-  },
+  }
   
-
 })
 
 const Usuario = mongoose.model('usuario', usuarioSchema);

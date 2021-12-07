@@ -84,7 +84,7 @@ module.exports = {
     `,
       attachments: [{
         filename: 'email-img.png',
-        path: __dirname + '/email-img.png',
+        path: __dirname + '/email-img.jpg',
         cid: 'logo'
       }]
     };

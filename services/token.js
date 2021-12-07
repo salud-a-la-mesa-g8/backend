@@ -16,6 +16,7 @@ module.exports = {
   },
   decode: async (req, ctrl) => {
     const bearerHeader = req.headers["authorization"]
+    // console.log("bearerHeader: ",bearerHeader)
     if (typeof bearerHeader === 'undefined') {
       return false
     }
@@ -37,7 +38,8 @@ module.exports = {
         var a,b,res = [];        
         return false;  
       }
-    } catch (error) {      
+    } catch (error) {  
+      console.log("error: ",error)
       return false;
     }
 

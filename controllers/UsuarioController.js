@@ -30,51 +30,57 @@ const handleErrors = (err) => {
 
 module.exports = {
   add: async (req, res, next) => {
+    // console.log("req.body: ",req.body)
+    // console.log("req.headers: ",req.headers["authorization"])
     // acceso y autorización (enviar el nombre del controller) 
     const vToken = await token.decode(req, "usuario")
     // si el token no es valido
     if (!vToken) return res.json({"msg":"error: La firma de la solicitud no es confiable. Salga del sistema y vuelva a ingresar."})
+    // console.log("vtoken: ",vToken)
     // operativa del controller
     //--------------------------------------------------------------
     try {
-      // 1- revisar si el email o el celular existen
-      checkEmail = await models.Usuario.findOne({$or:{
-        correo: req.body.correo,
-        celular: req.body.celular}
-      })
-      if (!checkEmail) {
-        // 2- guardamos la info en la bd (pwd: 123456)
-        req.body.pwd = await bcrypt.hash(req.body.pwd, 10)
-        const reg = await models.Usuario.create(req.body)
-        res.json({"msg":"ok:","obj":reg})
-      } else {
-        res.json({"msg":"error: El correo o el celular ya existen en la base de datos"})
+      // 1- revisar si el email o el celular existen      
+      checkUser = await models.Usuario.findOne({ celular: req.body.celular }).exec();      
+      if (!checkUser) {
+        checkUser = await models.Usuario.findOne({ correo: req.body.correo }).exec();        
+        if (checkUser) {
+          return res.json({ "msg":"error: Este correo ya existe en la plataforma." })
+        }
+      }else{
+        return res.json({ "msg":"error: Este celular ya existe en la plataforma." })
       }
+      // se cre el usr nuevo
+      await models.Usuario.create(req.body)
+      const reg = await models.Usuario.findOne({ celular: req.body.celular })
+      res.json({"msg":"ok:", "obj":reg})      
     } catch (err) {
-      const errores = handleErrors(err);
-      res.json({"msg":"error: "+errores });
+      // console.log("err: ",err)
+      res.json({"msg":"error: "+err});
       next();
     }
 
   },
   login: async (req, res, next) => {
+    console.log("req.body: ",req.body)
     try {
-      checkUser = await models.Usuario.findOne({ celular: req.body.usuario, estado :1 }).exec();            
+      checkUser = await models.Usuario.findOne({ celular: req.body.usuario, estado :1 }).exec();
+      // console.log("checkUser: ", checkUser)
       if (!checkUser) {
         checkUser = await models.Usuario.findOne({ correo: req.body.usuario, estado :1 }).exec();
         if (!checkUser) {
-          return res.json({ "msg":"error: Usuario no existe o está inactivo" })
+          return res.json({ "msg":"error: Usuario no existe o está inactivo. Intenta de nuevo" })
         }        
-      }
+      }      
       // 1- revisamos pwd
       let match = await bcrypt.compare(req.body.pwd, checkUser.pwd)
       if (match) {
-        // 2 - generamos token          
+        // 2 - generamos token        
         let tokenReturn = await token.encode(checkUser);
         // 3 - respondemos
         res.json({ "msg":"ok", "obj":tokenReturn })
       } else {
-        res.json({ "msg":"error: Usuario no autorizado" })
+        res.json({ "msg":"error: Password incorrecto. Intenta de nuevo." })
       }
       
     } catch (err) {
@@ -86,7 +92,7 @@ module.exports = {
     // acceso y autorización (enviar el nombre del controller) 
     const vToken = await token.decode(req, "usuario")
     // si el token no es valido
-    if (!vToken) return res.json({"msg":"error: La firma de la solicitud no es confiable. Salga del sistema y vuelva a ingresar."})
+    if (!vToken) return res.json({"msg":"error: La firma de la solicitud no es confiable. Vuelve a ingresar."})
     // operativa del controller
     //--------------------------------------------------------------
     try {
@@ -102,7 +108,7 @@ module.exports = {
           ]
       }, '_id nombre correo celular estado modifiedBy modifiedAt auth').sort({ modifiedAt: -1 });
 
-      res.status(200).json(reg)
+      res.status(200).json({"msg":"ok", "obj":reg})
     } catch (err) {
       res.json({"msg":"error: "+err });
       next();
@@ -124,7 +130,7 @@ module.exports = {
         { estado: estadoAux }
       );
       const reg = await models.Usuario.findOne({ _id: req.body._id })
-      res.status(200).json(reg)
+      res.status(200).json({"msg":"ok","obj":reg})
     } catch (err) {
       res.json({ "msg":"error: "+err });
       next();
@@ -139,22 +145,37 @@ module.exports = {
     // operativa del controller
     //--------------------------------------------------------------
     try {
-      const regBD = await models.Usuario.findOne({ correo: req.body.correo })
-      // si hay cambio contraseña
-      if (req.body.pwd !== regBD.pwd) {
-        req.body.pwd = await bcrypt.hash(req.body.pwd, 10)
+      console.log("req.body._id: ",req.body._id)
+      const regBD = await models.Usuario.findOne({ _id: req.body._id })
+      // revisar si hay cambio de email o de celular y si existen
+      if (regBD.correo !== req.body.correo) {
+        checkUser = await models.Usuario.findOne({ correo: req.body.correo }).exec();        
+        if (checkUser) {
+          return res.json({ "msg":"error: Este correo ya existe en la plataforma." })
+        }
       }
-      await models.Usuario.updateOne({ correo: req.body.correo, celular: req.body.celular },
+      if (regBD.celular !== req.body.celular) {
+        checkUser = await models.Usuario.findOne({ celular: req.body.celular }).exec();  
+        if (checkUser) {
+          return res.json({ "msg":"error: Este celular ya existe en la plataforma." })
+        }
+      }
+      // si hay cambio contraseña
+      // if (req.body.pwd !== regBD.pwd) {
+      //   req.body.pwd = await bcrypt.hash(req.body.pwd, 10)
+      // }
+      await models.Usuario.updateOne({ _id: req.body._id },
         {
           nombre: req.body.nombre,
-          pwd: req.body.pwd,
+          correo: req.body.correo,
+          celular: req.body.celular,          
           auth: req.body.auth,
           estado: req.body.estado,
           modifiedBy: req.body.modifiedBy
         }
       )
-      const reg = await models.Usuario.findOne({ correo: req.body.correo })
-      res.json({ "msg":"", "obj":reg})
+      const reg = await models.Usuario.findOne({ _id: req.body._id })
+      res.json({ "msg":"ok", "obj":reg})
     } catch (err) {
       res.json({ "msg":"error:"+err });
       next();
@@ -166,7 +187,7 @@ module.exports = {
       if (!checkUser) {
         checkUser = await models.Usuario.findOne({ correo: req.body.usuario, estado :1 }).exec();
         if (!checkUser) {
-          return res.json({ "msg":"error: En la plataforma no se encuentra el correo o el celular que ingresaste" })
+          return res.json({ "msg":"error: Este correo o celular no existen. Intenta de nuevo." })
         }
       }      
       const celular = checkUser.celular;
@@ -178,7 +199,7 @@ module.exports = {
       var respuesta = '';
       
       // actualizamos la tabla con los datos de recuperación del usuario
-      const regAux2 = await models.Usuario.updateOne(
+      await models.Usuario.updateOne(
         { _id: checkUser._id },
         { codigo: codigo, 
           try: 0, 
@@ -187,16 +208,16 @@ module.exports = {
       );            
 
       if(!msg.emailRecuperar(correo, nombre, codigo)){
-        respueta = respuesta + "error: No te pudimos enviar mensaje de correo electrónico con el código. Intenta en unos segundos. ";
+        respueta = respuesta + "error: No pudimos enviarte un email. Intenta de nuevo en unos segundos. ";
         next();
       }
       
       if(!msg.sms(celular, codigo)){
-        respuesta = respuesta + "error: No te pudimos enviar mensaje SMS a tu celular con el código. Intenta en unos segundos. ";
+        respuesta = respuesta + "error: No pudimos enviarte un SMS. Intenta de nuevo en unos segundos. ";
         next();
       }
       
-      respuesta += " Por favor verifica tu celular y/o tu email en unos minutos porque recibirás el código solicitado";
+      respuesta += "-Verifica tu celular/email en unos segundos";
 
       res.json({"msg":respuesta})
     } catch (err) {
@@ -210,16 +231,16 @@ module.exports = {
       if (!checkUser) {
         checkUser = await models.Usuario.findOne({ correo: req.body.usuario, estado :1 }).exec();
         if (!checkUser) {
-          return res.json({"msg":"error: En la plataforma no se encuentra el correo o el celular que ingresaste"})
+          return res.json({"msg":"error: No existe este correo/celular. Intenta de nuevo"})
         }
       }
       // 1- verificamos intentos, igualdad y expiración
       let intentos = 0      
-      if (checkUser.try < 3) {
-        if (req.body.codigo === checkUser.codigo) {
+      if (checkUser.try < 3) { // intentos
+        if (req.body.codigo === checkUser.codigo) { // código
           const exp = new Date().getTime()
-          if (exp > checkUser.exp) {
-            return res.json({"msg":"error: Tu código ya expiro (20 min). Solicita un nuevo código."})
+          if (exp > checkUser.exp) { // expiración
+            return res.json({"msg":"error: Código ya expiró (20 min). Por favor solicita uno nuevo."})
           }
         }else{
           intentos = checkUser.try + 1
@@ -227,10 +248,10 @@ module.exports = {
             { _id: checkUser._id },
             { try: intentos }
           );        
-          return res.json({"msg":"error: El código no corresponde al generado por la plataforma. llevas "+intentos+" intento(s) de 3. Vuelve a intentarlo."})
+          return res.json({"msg":"error: Código invalido. Llevas "+intentos+" intento(s) de 3. Intenta de nuevo."})
         }
       }else{        
-        return res.json({"msg":"error: Código expiró. Ya hiciste 3 intentos con este código. Solicita un nuevo código."})
+        return res.json({"msg":"error: Código expiró (3 intentos). Solicita uno nuevo."})
       }
 
       // recuperamos id
@@ -238,7 +259,7 @@ module.exports = {
       // 2- encryptado del pwd
       req.body.pwd = await bcrypt.hash(req.body.pwd, 10)      
       // 3- actualizamos en la tabla de usuarios el nuevo pwd
-      const regAux2 = await models.Usuario.updateOne(
+      await models.Usuario.updateOne(
         { _id: checkUser._id },
         {          
           pwd: req.body.pwd, 
@@ -246,7 +267,7 @@ module.exports = {
           try: 0,
           exp: 0          
         },        
-      );      
+      );
       // 4 - consultamos los nuevos datos del usuario
       checkUser = await models.Usuario.findOne({
         _id: id
